@@ -24,7 +24,7 @@ jobs:
 
     env:  # Define environment variables here for all steps in this job
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # Example secret for AWS
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # Example secret for AWS
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_ID }}  # Example secret for AWS
       AWS_REGION: "us-east-1"  # Example region
       BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE }}
       EKS_CLUSTER: vprofile-cluster
