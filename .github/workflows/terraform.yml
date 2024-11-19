@@ -1,0 +1,65 @@
+name: Terraform Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - stage
+    paths:
+      - terraform/**  # Trigger on changes to the Terraform code
+  pull_request:
+    branches:
+      - main
+    paths:
+      - terraform/**
+
+jobs:
+  terraform:
+    name: "Apply terraform code changes"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform
+
+    env:  # Define environment variables here for all steps in this job
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # Example secret for AWS
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # Example secret for AWS
+      AWS_REGION: "us-east-1"  # Example region
+      BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE }}
+      EKS_CLUSTER: vprofile-cluster
+    steps:
+      # Step 1: Check out the source code
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Terraform
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+       # with:
+        #  terraform_version: latest
+
+      # Step 3: Terraform Init with backend config
+      - name: Terraform Init
+        id: init
+        run: terraform init --backend-config="bucket=$BUCKET_TF_STATE"
+
+      # Step 4: Terraform fmt (Format Check)
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
+
+      # Step 5: Terraform Validate
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+
+      # Step 6: Terraform Plan
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -out myfile
+        continue-on-error: true
+      
+      - name: Terraform plan status
+        if: steps.plan.outcome== 'failure'
+        run: exit 1
