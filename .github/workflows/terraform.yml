@@ -36,8 +36,8 @@ jobs:
       # Step 2: Install Terraform
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
-       # with:
-        #  terraform_version: latest
+        with:
+          terraform_version: "~> 1.6.3"
 
       # Step 3: Terraform Init with backend config
       - name: Terraform Init
